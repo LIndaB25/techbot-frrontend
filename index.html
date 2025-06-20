@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechBot nga MBPristina</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: #f0f4f8;
+    }
+    #chatbox {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 10px;
+      height: 400px;
+      overflow-y: scroll;
+      margin-top: 10px;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    .brand {
+      font-weight: bold;
+      color: #3498db;
+    }
+    #loginModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #loginForm {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+    }
+    #historyToggle {
+      margin-top: 10px;
+      cursor: pointer;
+      color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginModal">
+    <div id="loginForm">
+      <h3>Identifikohu te TechBot</h3>
+      <input type="text" id="username" placeholder="Emri i përdoruesit"><br>
+      <input type="password" id="password" placeholder="Fjalëkalimi"><br>
+      <button onclick="login()">Kyçu</button>
+    </div>
+  </div>
+
+  <h2>🤖 <span class="brand">TechBot nga MBPristina</span></h2>
+  <p>Mirë se vini! Pyet gjithçka rreth IT, programimit dhe pajisjeve elektronike.</p>
+
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="Shkruaj pyetjen tënde...">
+  <button onclick="sendMessage()">Dërgo</button>
+  <div id="historyToggle" onclick="toggleHistory()">Shfaq/Fshih historinë</div>
+
+  <script>
+    const chatbox = document.getElementById("chatbox");
+    let chatHistory = [];
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user && pass) {
+        document.getElementById("loginModal").style.display = "none";
+      } else {
+        alert("Plotësoni të gjitha fushat.");
+      }
+    }
+
+    async function sendMessage() {
+      const userText = document.getElementById("userInput").value;
+      chatbox.innerHTML += `<p><strong>Ti:</strong> ${userText}</p>`;
+      chatHistory.push({role: "user", content: userText});
+      document.getElementById("userInput").value = "";
+
+      const res = await fetch("https://techbot-backendd.onrender.com/chat")
+, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText })
+      });
+
+      const data = await res.json();
+      chatbox.innerHTML += `<p><strong>TechBot:</strong> ${data.response}</p>`;
+      chatHistory.push({role: "bot", content: data.response});
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function toggleHistory() {
+      alert(JSON.stringify(chatHistory, null, 2));
+    }
+  </script>
+</body>
+</html>
